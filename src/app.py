@@ -6,6 +6,9 @@ from src.agents.da_agent.graph import create_data_analysis_agent
 
 async def app():
     agent = await create_data_analysis_agent()
+    # Single thread_id for the whole session — the MemorySaver checkpointer
+    thread_id = str(uuid.uuid4())
+    config = {"configurable": {"thread_id": thread_id}}
     print("Data Analysis Agent ready. Type 'exit' or 'quit' to stop.\n")
 
     while True:
@@ -22,10 +25,9 @@ async def app():
             print("Goodbye!")
             break
 
-        # Use a unique thread ID per invocation (stateless conversation)
         response = await agent.ainvoke(
             {"messages": user_input},
-            config={"configurable": {"thread_id": str(uuid.uuid4())}},
+            config=config,
         )
         print(f"Agent: {response['messages'][-1].content}\n")
 
