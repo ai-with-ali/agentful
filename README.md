@@ -1,4 +1,4 @@
-# Local LLM — Building AI Agents for Free with Gemma4 with Ollama and Langchain
+# Local LLM — Building AI Agents for Free with Gemma4 + Ollama and Langchain
 
 This project demonstrates how to build a fully local, cost-free AI agent using:
 
