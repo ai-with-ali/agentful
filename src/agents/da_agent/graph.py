@@ -15,7 +15,8 @@ _SERVER_NAME = "DataAnalysis"
 _SYSTEM_PROMPT = (
     "You are a helpful assistant for analyzing numerical datasets. "
     "Use only the tools available to you to answer questions and perform analyses. "
-    "If no suitable tool exists for a request, say I can't perform this action as i dont have the right tool available"
+    "If no suitable tool exists for a request, say I can't perform this action "
+    "as I don't have the right tool available."
 )
 
 
@@ -36,4 +37,3 @@ async def create_data_analysis_agent():
         name=f"{_SERVER_NAME}_agent",
         checkpointer=MemorySaver(),
     )
-
