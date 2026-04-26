@@ -7,7 +7,10 @@ load_dotenv()
 
 mcp = FastMCP(
     name="DataAnalysis",
-    instructions="Provides tools for analyzing numerical datasets. Start with get_summary() for an overview.",
+    instructions=(
+        "Provides tools for analyzing numerical datasets. "
+        "Start with get_summary() for an overview."
+    ),
 )
 
 
