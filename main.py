@@ -1,6 +1,2 @@
-import asyncio
-
-from src.app import app
-
-if __name__ == "__main__":
-    asyncio.run(app())
+# Chainlit entry point — registers all @cl.on_* handlers by importing the module.
+import src.app  # noqa: F401
