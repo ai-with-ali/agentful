@@ -1,0 +1,13 @@
+# Declarative list of A2A agent servers.
+#
+# Chainlit discovers agents at startup by fetching each agent's Agent Card
+# from <url>/.well-known/agent.json.  Add a new agent here and it will be
+# automatically available for routing — no changes to app.py required.
+#
+# Fields:
+#   url   – Base URL where the A2A server is running (no trailing path).
+#   name  – Human-readable label used in log messages.
+
+agents:
+  - url: "http://localhost:10001"
+    name: "Data Analysis Agent"
