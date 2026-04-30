@@ -1,15 +1,17 @@
 import traceback
 import uuid
+from pathlib import Path
 
 import chainlit as cl
-from langchain_core.runnables.config import RunnableConfig
-from langchain_core.messages import HumanMessage, ToolMessage
 
-from src.agents.da_agent.graph import create_data_analysis_agent
+from src.a2a.orchestrator.client import A2AAgentClient
+from src.a2a.orchestrator.registry import AgentRegistry
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Session lifecycle
+# Config
 # ──────────────────────────────────────────────────────────────────────────────
+
+_CONFIG_PATH = Path(__file__).parent.parent / "config" / "agents.yaml"
 
 _WELCOME_MESSAGE = """\
 ### Running the Agent Locally in your machine for free!
@@ -24,21 +26,23 @@ I can help you perform numerical analyses using a set of specialised tools.
 Type your question below to get started.
 """
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Session lifecycle
+# ──────────────────────────────────────────────────────────────────────────────
+
 
 @cl.on_chat_start
 async def on_chat_start() -> None:
-    """Initialise a fresh agent and thread_id for every new browser session."""
-    # The MemorySaver checkpointer is embedded inside the agent,
-    # so conversation history is automatically scoped to thread_id.
-    agent = await create_data_analysis_agent()
-    thread_id = str(uuid.uuid4())
+    """Discover available A2A agents and initialise a conversation context."""
+    registry = AgentRegistry(config_path=_CONFIG_PATH)
+    await registry.discover()
 
-    cl.user_session.set("agent", agent)
-    cl.user_session.set("thread_id", thread_id)
+    cl.user_session.set("registry", registry)
+    cl.user_session.set("thread_id", str(uuid.uuid4()))
 
     await cl.Message(
         content=_WELCOME_MESSAGE,
-        author="Data Analysis Agent",
+        author="Agent Orchestrator",
     ).send()
 
 
@@ -49,44 +53,50 @@ async def on_chat_start() -> None:
 
 @cl.on_message
 async def on_message(message: cl.Message) -> None:
-    """Stream agent response with tool-call steps via LangchainCallbackHandler."""
-    agent = cl.user_session.get("agent")
-    thread_id = cl.user_session.get("thread_id")
+    """Route the user message to the best-matching A2A agent and stream the reply.
 
-    # cl.LangchainCallbackHandler automatically renders tool steps in the UI.
-    cb = cl.LangchainCallbackHandler()
-    run_config = RunnableConfig(
-        callbacks=[cb],
-        configurable={"thread_id": thread_id},
-    )
+    Flow:
+    1. AgentRegistry.find_agent() selects an agent by skill-tag matching.
+    2. A2AAgentClient.send_streaming() sends the message via A2A JSON-RPC/SSE.
+    3. Intermediate "working" events are surfaced as collapsible Chainlit Steps.
+    4. The final answer is streamed token-by-token into the reply message.
+    """
+    registry: AgentRegistry = cl.user_session.get("registry")
+    thread_id: str = cl.user_session.get("thread_id")
 
-    final_answer = cl.Message(content="", author="Data Analysis Agent")
+    agent_card = registry.find_agent(message.content)
+    if not agent_card:
+        await cl.Message(
+            content=(
+                "No agent is currently available. "
+                "Please start an agent server and reload."
+            ),
+            author="System",
+        ).send()
+        return
+
+    a2a_client = A2AAgentClient()
+    final_answer = cl.Message(content="", author=agent_card.name)
 
     try:
-        async for chunk, _metadata in agent.astream(
-            {"messages": [HumanMessage(content=message.content)]},
-            config=run_config,
-            stream_mode="messages",
-        ):
-            # Skip human echoes and raw tool-result messages;
-            # stream only LLM-generated text tokens.
-            if isinstance(chunk, (HumanMessage, ToolMessage)):
-                continue
+        async with cl.Step(
+            name=f"{agent_card.name} — processing", type="tool"
+        ) as work_step:
+            async for event in a2a_client.send_streaming(
+                agent_card, message.content, thread_id
+            ):
+                event_type = event["type"]
+                content = event["content"]
 
-            token = chunk.content
-            if not token:
-                continue
-
-            # content can be a plain string or a list of content-part dicts
-            if isinstance(token, list):
-                token = "".join(
-                    part.get("text", "")
-                    for part in token
-                    if isinstance(part, dict)
-                )
-
-            if token:
-                await final_answer.stream_token(token)
+                if event_type == "working" and content:
+                    # Append each working event so all steps remain visible.
+                    if work_step.output:
+                        work_step.output += "\n\n" + content
+                    else:
+                        work_step.output = content
+                    await work_step.update()
+                elif event_type in ("final", "input_required") and content:
+                    await final_answer.stream_token(content)
 
     except Exception:  # noqa: BLE001
         error_detail = traceback.format_exc()
