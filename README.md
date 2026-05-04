@@ -1,4 +1,4 @@
-# Agentful — Local agentic AI starter for engineers
+# Agentful — Local agentic AI with SLM
 
 > A production-ready template for building agentic AI systems with local LLMs —
 > no API keys, no cloud costs, everything runs on your own machine.
