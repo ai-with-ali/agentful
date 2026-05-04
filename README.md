@@ -1,6 +1,6 @@
 # Agentful — Local agentic AI with SLM
 
-> A production-ready template for building agentic AI systems with local LLMs —
+> A production-ready template for building agentic AI systems with SLM / local LLMs 
 > no API keys, no cloud costs, everything runs on your own machine.
 
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/)
@@ -13,8 +13,8 @@
 
 **Agentful** is an engineer-facing starter template for building agentic AI
 applications backed entirely by local LLMs. It wires together the most important
-open protocols and frameworks in the agentic AI ecosystem — **A2A**, **MCP**,
-**LangGraph**, and **Chainlit** — into a clean, extensible architecture you can
+open protocols and frameworks in the agentic AI ecosystem i.e:
+— **A2A**, **MCP**, **LangGraph**, and **Chainlit** — into a clean, extensible architecture you can
 clone and build on today.
 
 ![Agent demo](agent.gif)
