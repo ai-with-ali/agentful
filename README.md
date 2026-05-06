@@ -1,48 +1,46 @@
 # Agentful — Local agentic AI with SLM
 
-> A production-ready template for building agentic AI systems with SLM / local LLMs 
-> no API keys, no cloud costs, everything runs on your own machine.
+> A production-ready template for building agentic AI systems with SLM / local LLMs no API keys, no cloud costs, everything runs on your own machine.
 
-[![Python](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![uv](https://img.shields.io/badge/package%20manager-uv-purple)](https://github.com/astral-sh/uv)
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+
+![uv](https://img.shields.io/badge/package%20manager-uv-purple)
 
 ---
 
 ## Overview
 
-**Agentful** is an engineer-facing starter template for building agentic AI
-applications backed entirely by local LLMs. It wires together the most important
-open protocols and frameworks in the agentic AI ecosystem i.e:
-— **A2A**, **MCP**, **LangGraph**, and **Chainlit** — into a clean, extensible architecture you can
-clone and build on today.
+**Agentful** is an engineer-facing starter template for building agentic AI applications backed entirely by local LLMs. It wires together the most important open protocols and frameworks in the agentic AI ecosystem i.e: — **A2A**, **MCP**, **LangGraph**, and **Chainlit** — into a clean, extensible architecture you can clone and build on today.
 
-![Agent demo](agent.gif)
+![Agent demo](./.doc/agent.gif)
 
 **Use Agentful to:**
 
 - Learn how agentic AI systems are structured in practice.
 - Bootstrap a new local agent project with best-practice patterns already in place.
-- Experiment with A2A multi-agent orchestration and MCP tool serving without
-  writing boilerplate.
+- Experiment with A2A multi-agent orchestration and MCP tool serving without writing boilerplate.
 
 ---
 
 ## Stack
 
-| Component | Role |
-|---|---|
-| [Ollama](https://ollama.com/) | Serves the LLM locally via an OpenAI-compatible HTTP API |
-| [Gemma 4 e2b](https://ai.google.dev/gemma/docs/core) | Lightweight quantised model (~2 GB), runs on laptop GPU or CPU |
-| [LangGraph](https://github.com/langchain-ai/langgraph) | Agent reasoning loop with persistent memory and checkpointing |
-| [A2A SDK](https://github.com/google-deepmind/a2a) | Agent-to-Agent protocol — standardised inter-agent communication |
-| [FastMCP](https://github.com/jlowin/fastmcp) | Exposes Python functions as MCP tools over HTTP |
-| [langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters) | Discovers and wraps MCP tools for use in LangChain agents |
-| [Chainlit](https://chainlit.io/) | Streaming chat web UI with per-session thread management |
+| Component                                                                        | Role                                                             |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Ollama](https://ollama.com/)                                                    | Serves the LLM locally via an OpenAI-compatible HTTP API         |
+| [Gemma 4 e2b](https://ai.google.dev/gemma/docs/core)                             | Lightweight quantised model (~2 GB), runs on laptop GPU or CPU   |
+| [LangGraph](https://github.com/langchain-ai/langgraph)                           | Agent reasoning loop with persistent memory and checkpointing    |
+| [A2A SDK](https://github.com/google-deepmind/a2a)                                | Agent-to-Agent protocol — standardised inter-agent communication |
+| [FastMCP](https://github.com/jlowin/fastmcp)                                     | Exposes Python functions as MCP tools over HTTP                  |
+| [langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters) | Discovers and wraps MCP tools for use in LangChain agents        |
+| [Chainlit](https://chainlit.io/)                                                 | Streaming chat web UI with per-session thread management         |
 
 ---
 
 ## Architecture
+
+![](./.doc/layer%20overview.png)
 
 ```mermaid
 flowchart LR
@@ -75,13 +73,13 @@ flowchart LR
 
 ### Key design patterns
 
-| Pattern | Where | Why |
-|---|---|---|
-| **A2A protocol** | `src/a2a/` | Standardised agent-to-agent communication — swap or add agents without touching the orchestrator |
-| **MCP tool serving** | `src/mcp/` | Tools are plain Python functions; discovery is automatic |
-| **LangGraph reasoning loop** | `src/agents/da_agent/graph.py` | Persistent memory, tool-use loop, and checkpointing out of the box |
-| **Token streaming** | `adapter.py` → `executor_base.py` → `client.py` → `app.py` | Each LLM token is forwarded end-to-end via SSE artifact chunks |
-| **Declarative agent registry** | `config/agents.yaml` | Add a new agent server without touching any Python |
+| Pattern                        | Where                                                      | Why                                                                                              |
+| ------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **A2A protocol**               | `src/a2a/`                                                 | Standardised agent-to-agent communication — swap or add agents without touching the orchestrator |
+| **MCP tool serving**           | `src/mcp/`                                                 | Tools are plain Python functions; discovery is automatic                                         |
+| **LangGraph reasoning loop**   | `src/agents/da_agent/graph.py`                             | Persistent memory, tool-use loop, and checkpointing out of the box                               |
+| **Token streaming**            | `adapter.py` → `executor_base.py` → `client.py` → `app.py` | Each LLM token is forwarded end-to-end via SSE artifact chunks                                   |
+| **Declarative agent registry** | `config/agents.yaml`                                       | Add a new agent server without touching any Python                                               |
 
 ---
 
@@ -89,12 +87,12 @@ flowchart LR
 
 Before you begin, make sure you have the following installed and running:
 
-| Requirement | Version / notes |
-|---|---|
-| Python | 3.12 or later |
-| [uv](https://github.com/astral-sh/uv) | Recommended package manager |
-| [Ollama](https://ollama.com/download) | Must be running (`ollama serve`) |
-| Gemma 4 e2b | Pull with `ollama pull gemma4:e2b` |
+| Requirement                           | Version / notes                    |
+| ------------------------------------- | ---------------------------------- |
+| Python                                | 3.12 or later                      |
+| [uv](https://github.com/astral-sh/uv) | Recommended package manager        |
+| [Ollama](https://ollama.com/download) | Must be running (`ollama serve`)   |
+| Gemma 4 e2b                           | Pull with `ollama pull gemma4:e2b` |
 
 ---
 
@@ -202,34 +200,29 @@ Agent Card available at `http://localhost:10001/.well-known/agent-card.json`.
 uv run chainlit run main.py --port 8000
 ```
 
-Open [http://localhost:8000](http://localhost:8000) in your browser.
+Open http://localhost:8000 in your browser.
 
-> **VS Code users:** use the **Run & Debug** panel. Select each configuration
-> from the dropdown and press `F5`.
+> **VS Code users:** use the **Run & Debug** panel. Select each configuration from the dropdown and press `F5`.
 
 ---
 
 ## How it works
 
 1. **User sends a message** in the Chainlit UI.
-2. **`AgentRegistry`** reads `config/agents.yaml`, fetches each agent's Card from
-   `/.well-known/agent-card.json`, and routes the query to the best-matching agent
-   by skill-tag matching.
+2. **`AgentRegistry`** reads `config/agents.yaml`, fetches each agent's Card from `/.well-known/agent-card.json`, and routes the query to the best-matching agent by skill-tag matching.
 3. **`A2AAgentClient`** opens a JSONRPC/SSE stream to the selected A2A agent server.
 4. **`BaseAgentExecutor`** runs the LangGraph agent and forwards events upstream:
    - Tool call details (name and arguments) → `TASK_STATE_WORKING` status update
    - Tool results → `TASK_STATE_WORKING` status update
    - LLM tokens → `TaskArtifactUpdateEvent` chunks (streamed immediately)
-5. **Chainlit** renders working events as a collapsible step and streams each LLM
-   token into the reply message in real time.
+1. **Chainlit** renders working events as a collapsible step and streams each LLM token into the reply message in real time.
 
 ---
 
 ## Add a new agent
 
 1. Create `src/agents/<your_agent>/graph.py` with your LangGraph graph.
-2. Create `src/a2a/agents/<your_agent>/` mirroring the `da_agent` structure:
-   `adapter.py`, `card.py`, `executor.py`, `__main__.py`.
+2. Create `src/a2a/agents/<your_agent>/` mirroring the `da_agent` structure: `adapter.py`, `card.py`, `executor.py`, `__main__.py`.
 3. Add the agent URL to `config/agents.yaml` — no other changes are needed.
 
 ---
@@ -245,8 +238,7 @@ def divide(a: float, b: float) -> float:
     return a / b
 ```
 
-Restart the MCP server. The tool is automatically discovered by the agent on
-the next startup.
+Restart the MCP server. The tool is automatically discovered by the agent on the next startup.
 
 ---
 
